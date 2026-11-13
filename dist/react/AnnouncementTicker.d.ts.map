@@ -1,0 +1,1 @@
+{"version":3,"file":"AnnouncementTicker.d.ts","sourceRoot":"","sources":["../../src/react/AnnouncementTicker.tsx"],"names":[],"mappings":"AAEA,KAAK,UAAU,GAAG;IAChB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,CAAC,EAAE,MAAM,CAAC;IACd,SAAS,CAAC,EAAE,OAAO,CAAC;CACrB,CAAC;AAEF;;;;GAIG;AACH,wBAAgB,kBAAkB,CAAC,EAAE,KAAK,EAAE,EAAE;IAAE,KAAK,EAAE,UAAU,EAAE,CAAA;CAAE,+BA8CpE"}

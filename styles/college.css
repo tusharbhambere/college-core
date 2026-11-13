@@ -1,0 +1,1043 @@
+/* ===========================================================================
+ * @college/core design system (Tailwind CSS v4).
+ *
+ * Usage in a site's global stylesheet:
+ *
+ *   @import "tailwindcss";
+ *   @import "@college/core/theme.css";   (or your own file setting the --brand-* inputs)
+ *   @import "@college/core/styles.css";
+ *
+ * Every colour is derived from the --brand-* inputs, so a college is re-skinned by
+ * changing those inputs only. The @source line lets Tailwind generate the utilities
+ * used by the package's React components.
+ * ======================================================================== */
+@source "../dist/react";
+
+
+/* Design tokens — DERIVED from the four brand inputs in theme.css.
+ * Do not hard-code colours anywhere else: components use the Tailwind
+ * utilities generated below (bg-primary, text-accent, border-border, …) and
+ * CSS in this file uses var(--…) / color-mix() on these tokens.
+ *   primary*  → brand ramp (base → dark → deep → ink)
+ *   accent*   → highlight fill, readable text on light, highlight on dark
+ *   on-*      → foregrounds paired with their named surface
+ *   muted*    → brand-tinted light surfaces (never text colours) */
+:root {
+  --primary: var(--brand-primary);
+  --primary-dark: color-mix(in oklab, var(--brand-primary), black 12%);
+  --primary-deep: color-mix(in oklab, var(--brand-primary), black 22%);
+  --primary-ink: color-mix(in oklab, var(--brand-primary), black 44%);
+  --accent: var(--brand-accent);
+  /* Keep the fill stable so arbitrary tenant accents retain label contrast.
+   * Shadow, sheen and movement provide the button's hover feedback. */
+  --accent-hover: var(--accent);
+  --accent-foreground: color-mix(in oklab, var(--brand-accent), black 50%);
+  /* 68% white keeps dark tenant accents ≥ 4.5:1 on primary-deep as well. */
+  --accent-light: color-mix(in oklab, var(--brand-accent), white 68%);
+  --on-accent: var(--brand-on-accent);
+  --on-primary: #ffffff;
+  --on-primary-muted: color-mix(in oklab, white 92%, var(--primary-deep));
+  --surface: #ffffff;
+  --muted: color-mix(in oklab, var(--brand-primary) 6%, var(--brand-surface));
+  --muted-light: color-mix(in oklab, var(--brand-primary) 3.5%, var(--brand-surface));
+  --off-white: var(--brand-surface);
+  --slate: var(--brand-text);
+  --slate-muted: color-mix(in oklab, var(--brand-text) 78%, var(--brand-surface));
+  /* Decorative hairline, nudged toward the brand hue (not a contrast boundary). */
+  --border: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--brand-text) 60%, var(--brand-primary)) 15%,
+    var(--brand-surface)
+  );
+  --input-border: color-mix(in oklab, var(--brand-text) 58%, var(--brand-surface));
+  --focus: var(--primary);
+  --success: var(--brand-success);
+  --alert: var(--brand-alert);
+  --error: var(--brand-error);
+  --background: var(--off-white);
+  --foreground: var(--slate);
+
+  /* =========================================================================
+   * EXPANDED PALETTE — every value below is derived from the brand inputs, so
+   * runtime tenant colours (brandColor.ts) re-skin it automatically.
+   * Tailwind utilities are generated in @theme inline (bg-secondary,
+   * text-info-fg, shadow-elev-2, …); gradients are background-image utilities
+   * (bg-gradient-hero, bg-gradient-cta, bg-gradient-brand-line, …).
+   *
+   *   secondary          primary rotated −45° in OKLCH (teal for steel blue,
+   *                      plum for burgundy); lightness capped at 0.48 so white
+   *                      text on it stays ≥ 5.5:1. Text-safe on light surfaces.
+   *   secondary-deep     secondary + 30% black — dark gradient stops.
+   *   secondary-tint     10% secondary on white — light band/badge fill.
+   *   primary-vivid      primary at the same lightness, chroma × 1.3 — richer
+   *                      fills/gradients; white text keeps primary's contrast.
+   *   primary-glow       lighter, saturated primary — DECORATIVE glows only.
+   *   accent-strong      deeper, more saturated accent — rules/borders/icons
+   *                      (decorative; never a label background).
+   *   accent-tint        16% accent on white — warm band background.
+   *   surface-raised     card / panel surface (white).
+   *   surface-tint       6% primary on white — selected/hover rows, chips.
+   *   surface-sunken     9% primary on paper — wells, skeletons.
+   *   border-tint        brand-tinted card border (decorative).
+   *   border-strong      hover/selected border (decorative).
+   *   focus-on-dark      focus outline colour inside dark surfaces.
+   *   info|success|alert|error|new -fg / -bg / -border
+   *                      semantic badges; -fg on -bg ≥ 4.5:1.
+   *   --elevation-1…3, --elevation-accent
+   *                      primary-ink-tinted shadow scale (shadow-elev-*).
+   * ====================================================================== */
+  --secondary: var(--brand-secondary, var(--primary-dark));
+  --primary-vivid: var(--primary);
+  --primary-glow: color-mix(in oklab, var(--brand-primary), white 30%);
+  --accent-strong: color-mix(in oklab, var(--brand-accent), black 18%);
+  --secondary-deep: color-mix(in oklab, var(--secondary), black 30%);
+  --secondary-tint: color-mix(in oklab, var(--secondary) 10%, white);
+  --accent-tint: color-mix(in oklab, var(--brand-accent) 16%, white);
+  --surface-raised: var(--surface);
+  --surface-tint: color-mix(in oklab, var(--brand-primary) 6%, white);
+  --surface-sunken: color-mix(in oklab, var(--brand-primary) 9%, var(--brand-surface));
+  --border-tint: color-mix(in oklab, var(--brand-primary) 15%, white);
+  --border-strong: color-mix(in oklab, var(--brand-primary) 38%, white);
+  --focus-on-dark: var(--accent-light);
+
+  --info-fg: color-mix(in oklab, var(--secondary), black 12%);
+  --info-bg: color-mix(in oklab, var(--secondary) 11%, white);
+  --info-border: color-mix(in oklab, var(--secondary) 30%, white);
+  --success-fg: color-mix(in oklab, var(--success), black 22%);
+  --success-bg: color-mix(in oklab, var(--success) 11%, white);
+  --success-border: color-mix(in oklab, var(--success) 30%, white);
+  --alert-fg: color-mix(in oklab, var(--alert), black 10%);
+  --alert-bg: color-mix(in oklab, var(--alert) 11%, white);
+  --alert-border: color-mix(in oklab, var(--alert) 30%, white);
+  --error-fg: color-mix(in oklab, var(--error), black 18%);
+  --error-bg: color-mix(in oklab, var(--error) 8%, white);
+  --error-border: color-mix(in oklab, var(--error) 30%, white);
+  --new-fg: var(--on-accent);
+  --new-bg: var(--accent);
+  --new-border: var(--accent-strong);
+
+  --shadow-tint: var(--primary-ink);
+  --elevation-1:
+    0 1px 2px color-mix(in oklab, var(--shadow-tint) 8%, transparent),
+    0 1px 3px color-mix(in oklab, var(--shadow-tint) 6%, transparent);
+  --elevation-2:
+    0 1px 2px color-mix(in oklab, var(--shadow-tint) 7%, transparent),
+    0 8px 20px -6px color-mix(in oklab, var(--shadow-tint) 16%, transparent);
+  --elevation-3:
+    0 2px 6px color-mix(in oklab, var(--shadow-tint) 8%, transparent),
+    0 22px 44px -14px color-mix(in oklab, var(--shadow-tint) 28%, transparent);
+  --elevation-accent:
+    0 1px 0 color-mix(in oklab, white 45%, transparent) inset,
+    0 6px 18px -6px color-mix(in oklab, var(--accent-strong) 65%, transparent);
+
+  --gradient-brand-line: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 55%, var(--accent) 100%);
+  /* Same stripe for dark surfaces: lighter primary so the left end shows. */
+  --gradient-brand-line-on-dark: linear-gradient(90deg, var(--primary-glow) 0%, var(--secondary) 45%, var(--accent) 100%);
+  --gradient-accent: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  /* Accent rule for dark surfaces: starts light so dark tenant accents show. */
+  --gradient-accent-on-dark: linear-gradient(90deg, var(--accent-light), var(--accent));
+  --gradient-cta: linear-gradient(120deg, var(--primary-deep) 0%, var(--primary-vivid) 55%, var(--secondary) 100%);
+  --gradient-hero:
+    radial-gradient(58rem 32rem at 95% -18%, color-mix(in oklab, var(--primary-vivid) 75%, transparent), transparent 62%),
+    radial-gradient(42rem 28rem at -8% 118%, color-mix(in oklab, var(--secondary) 60%, transparent), transparent 64%),
+    radial-gradient(28rem 18rem at 68% 130%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 62%),
+    linear-gradient(128deg, var(--primary-ink) 0%, var(--primary-deep) 46%, var(--secondary-deep) 100%);
+  --gradient-masthead: linear-gradient(100deg, var(--primary-ink) 0%, var(--primary-deep) 42%, var(--secondary-deep) 100%);
+  --gradient-footer:
+    radial-gradient(46rem 24rem at 100% 0%, color-mix(in oklab, var(--secondary) 34%, transparent), transparent 64%),
+    radial-gradient(34rem 20rem at 0% 100%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--primary-deep) 0%, var(--primary-ink) 100%);
+  --gradient-band:
+    radial-gradient(40rem 22rem at 0% 0%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%),
+    radial-gradient(36rem 20rem at 100% 100%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 70%);
+  --gradient-tint: linear-gradient(180deg, var(--surface-tint) 0%, var(--brand-surface) 100%);
+}
+
+/* Hue-rotated / chroma-boosted tones need CSS relative colour syntax.
+ * Without it the fallbacks above (primary-dark, primary, white mixes) apply. */
+@supports (color: oklch(from red l c h)) {
+  :root {
+    --secondary: var(
+      --brand-secondary,
+      oklch(from var(--brand-primary) clamp(0.34, l, 0.48) min(c * 1.25, 0.12) calc(h - 45))
+    );
+    --primary-vivid: oklch(from var(--brand-primary) l min(c * 1.3, 0.19) h);
+    --primary-glow: oklch(from var(--brand-primary) min(calc(l + 0.2), 0.74) min(c * 1.4, 0.2) h);
+    --accent-strong: oklch(from var(--brand-accent) calc(l - 0.07) min(c * 1.5, 0.17) h);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-ink: var(--primary-ink);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--accent-light);
+  --color-on-accent: var(--on-accent);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-muted: var(--on-primary-muted);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-off-white: var(--off-white);
+  --color-slate: var(--slate);
+  --color-slate-muted: var(--slate-muted);
+  --color-border: var(--border);
+  --color-input-border: var(--input-border);
+  --color-focus: var(--focus);
+  --color-success: var(--success);
+  --color-alert: var(--alert);
+  --color-error: var(--error);
+  /* Expanded palette (see the EXPANDED PALETTE comment above). */
+  --color-secondary: var(--secondary);
+  --color-secondary-deep: var(--secondary-deep);
+  --color-secondary-tint: var(--secondary-tint);
+  --color-primary-vivid: var(--primary-vivid);
+  --color-primary-glow: var(--primary-glow);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-tint: var(--accent-tint);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border-tint: var(--border-tint);
+  --color-border-strong: var(--border-strong);
+  --color-focus-on-dark: var(--focus-on-dark);
+  --color-info-fg: var(--info-fg);
+  --color-info-bg: var(--info-bg);
+  --color-info-border: var(--info-border);
+  --color-success-fg: var(--success-fg);
+  --color-success-bg: var(--success-bg);
+  --color-success-border: var(--success-border);
+  --color-alert-fg: var(--alert-fg);
+  --color-alert-bg: var(--alert-bg);
+  --color-alert-border: var(--alert-border);
+  --color-error-fg: var(--error-fg);
+  --color-error-bg: var(--error-bg);
+  --color-error-border: var(--error-border);
+  --color-new-fg: var(--new-fg);
+  --color-new-bg: var(--new-bg);
+  --color-new-border: var(--new-border);
+  --shadow-elev-1: var(--elevation-1);
+  --shadow-elev-2: var(--elevation-2);
+  --shadow-elev-3: var(--elevation-3);
+  --shadow-elev-accent: var(--elevation-accent);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-block-start: var(--sticky-header-offset, 4.5rem);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+/* The body is a flex column; content must be allowed to shrink to its viewport. */
+main {
+  min-inline-size: 0;
+  inline-size: 100%;
+}
+
+@media (min-width: 80rem) {
+  html {
+    scroll-padding-block-start: var(--sticky-header-offset, 8rem);
+  }
+}
+
+/* Headings inherit color so they stay legible on dark (primary) sections. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), Georgia, serif;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 6px color-mix(in oklab, var(--focus) 18%, transparent);
+}
+
+/* Dark brand surfaces: a primary outline would vanish on primary-deep, so
+ * focus switches to the light accent. Add `.on-dark` to any dark container. */
+.on-dark :focus-visible,
+.surface-deep :focus-visible,
+.surface-hero :focus-visible {
+  outline-color: var(--focus-on-dark);
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--focus-on-dark) 24%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+ * Gradient & surface utilities (expanded palette). All brand-derived.
+ *   bg-gradient-hero       layered deep hero (white text ≥ 7:1)
+ *   bg-gradient-cta        primary-deep → primary-vivid → secondary (white text)
+ *   bg-gradient-masthead   dark header strip
+ *   bg-gradient-footer     dark footer with secondary / accent glows
+ *   bg-gradient-brand-line primary → secondary → accent signature stripe
+ *   bg-gradient-brand-line-on-dark  same stripe, lighter start for dark edges
+ *   bg-gradient-accent     accent → accent-strong rule (light surfaces)
+ *   bg-gradient-accent-on-dark  accent-light → accent rule (dark surfaces)
+ *   bg-gradient-band       faint primary/accent glows for light sections
+ *   bg-gradient-tint       surface-tint → paper vertical fade
+ *   bg-pattern-grid        faint dot pattern for dark panels (decorative)
+ * ------------------------------------------------------------------------- */
+@utility bg-gradient-hero {
+  background-color: var(--primary-deep);
+  background-image: var(--gradient-hero);
+}
+@utility bg-gradient-cta {
+  background-color: var(--primary);
+  background-image: var(--gradient-cta);
+}
+@utility bg-gradient-masthead {
+  background-color: var(--primary-deep);
+  background-image: var(--gradient-masthead);
+}
+@utility bg-gradient-footer {
+  background-color: var(--primary-ink);
+  background-image: var(--gradient-footer);
+}
+@utility bg-gradient-brand-line {
+  background-image: var(--gradient-brand-line);
+}
+@utility bg-gradient-brand-line-on-dark {
+  background-image: var(--gradient-brand-line-on-dark);
+}
+@utility bg-gradient-accent {
+  background-image: var(--gradient-accent);
+}
+@utility bg-gradient-accent-on-dark {
+  background-image: var(--gradient-accent-on-dark);
+}
+@utility bg-gradient-band {
+  background-image: var(--gradient-band);
+}
+@utility bg-gradient-tint {
+  background-image: var(--gradient-tint);
+}
+@utility bg-pattern-grid {
+  background-image: radial-gradient(color-mix(in oklab, white 16%, transparent) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(115deg, transparent 8%, #000 55%, transparent 96%);
+  mask-image: linear-gradient(115deg, transparent 8%, #000 55%, transparent 96%);
+}
+
+/* Section-level hero surface (PageHero, Section tone="gradient"). */
+.surface-hero {
+  background-color: var(--primary-deep);
+  background-image: var(--gradient-hero);
+}
+
+/* Semantic badges — pill labels with tinted fills. Pair `.badge` with one
+ * `.badge-{info|success|alert|error|new|brand}`. Each fg/bg pair ≥ 4.5:1. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.badge-info { color: var(--info-fg); background: var(--info-bg); border-color: var(--info-border); }
+.badge-success { color: var(--success-fg); background: var(--success-bg); border-color: var(--success-border); }
+.badge-alert { color: var(--alert-fg); background: var(--alert-bg); border-color: var(--alert-border); }
+.badge-error { color: var(--error-fg); background: var(--error-bg); border-color: var(--error-border); }
+.badge-new { color: var(--new-fg); background: var(--new-bg); border-color: var(--new-border); }
+.badge-brand { color: var(--on-primary); background: var(--primary); border-color: var(--primary-deep); }
+
+/* Loading skeleton shimmer — brand-tinted sweep, frozen under reduced motion. */
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+.skeleton-shimmer {
+  background-color: var(--surface-sunken);
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, white 70%, transparent) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion system
+ * All entrance/idle animations respect prefers-reduced-motion (zeroed below).
+ * ------------------------------------------------------------------------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1.5%, 0);
+  }
+}
+
+@keyframes float-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Hero entrance — staggered fade-up on load */
+.anim-fade-up {
+  opacity: 0;
+  animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.anim-delay-1 {
+  animation-delay: 0.1s;
+}
+.anim-delay-2 {
+  animation-delay: 0.22s;
+}
+.anim-delay-3 {
+  animation-delay: 0.34s;
+}
+.anim-delay-4 {
+  animation-delay: 0.46s;
+}
+.anim-delay-5 {
+  animation-delay: 0.6s;
+}
+.anim-delay-6 {
+  animation-delay: 0.75s;
+}
+
+/* Slow zoom on hero photography */
+.anim-ken-burns {
+  animation: ken-burns 16s ease-out infinite alternate;
+  will-change: transform;
+}
+
+/* Gentle idle float for hero accent cards */
+.anim-float {
+  animation: float-y 5.5s ease-in-out infinite alternate;
+}
+.anim-float-slow {
+  animation: float-y 7s ease-in-out 0.8s infinite alternate;
+}
+
+/* Announcement marquee — content is duplicated once, so -50% loops seamlessly */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 36s linear infinite;
+}
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+/* ECG pulse line draw-in (uses pathLength=1) */
+.pulse-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: pulse-draw 2.6s ease-out 0.9s forwards;
+}
+
+/* Scroll-reveal — hidden state only applies once JS has stamped html.js,
+ * so content stays visible without JavaScript. */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Staggered child reveal — put .stagger on a grid/list inside a revealed
+ * Section; children cascade in after the section itself becomes visible. */
+html.js .reveal .stagger > * {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.js .reveal.is-visible .stagger > * {
+  opacity: 1;
+  transform: none;
+}
+html.js .reveal.is-visible .stagger > *:nth-child(1) { transition-delay: 0.06s; }
+html.js .reveal.is-visible .stagger > *:nth-child(2) { transition-delay: 0.12s; }
+html.js .reveal.is-visible .stagger > *:nth-child(3) { transition-delay: 0.18s; }
+html.js .reveal.is-visible .stagger > *:nth-child(4) { transition-delay: 0.24s; }
+html.js .reveal.is-visible .stagger > *:nth-child(5) { transition-delay: 0.3s; }
+html.js .reveal.is-visible .stagger > *:nth-child(6) { transition-delay: 0.36s; }
+html.js .reveal.is-visible .stagger > *:nth-child(7) { transition-delay: 0.42s; }
+html.js .reveal.is-visible .stagger > *:nth-child(8) { transition-delay: 0.48s; }
+html.js .reveal.is-visible .stagger > *:nth-child(n + 9) { transition-delay: 0.54s; }
+
+/* Accent rules (eyebrow dash, stat card top line) draw in from the left
+ * once their section reveals. Outside a .reveal they render fully drawn. */
+html.js .reveal .rule-grow {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+html.js .reveal.is-visible .rule-grow {
+  transform: scaleX(1);
+}
+
+/*
+ * Button micro-interactions (safe stacking)
+ * ------------------------------------------------
+ * NEVER use solid ::before overlays for fills — absolute pseudos with
+ * transforms can paint over labels even with z-index in some browsers.
+ *
+ * Primary  → .btn-sheen  : translucent light streak only (opacity 0.22)
+ * Secondary → .btn-fill  : background-size grow (paints as element background,
+ *                          always behind text content)
+ * Dark panels → .btn-on-dark overrides --btn-fill / --btn-fill-fg
+ */
+
+.btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+/* Translucent diagonal light on primary — never solid, never hides text */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 60%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-sheen:hover::after,
+.btn-sheen:focus-visible::after {
+  transform: translateX(130%);
+}
+
+/*
+ * Secondary fill via background-image size (Slide Right technique).
+ * Background always paints under content — label cannot go blank.
+ */
+.btn-fill {
+  --btn-fill: var(--primary);
+  --btn-fill-fg: #ffffff;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  background-image: linear-gradient(var(--btn-fill), var(--btn-fill));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0% 100%;
+  transition:
+    background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+.btn-fill:hover,
+.btn-fill:focus-visible {
+  background-size: 100% 100%;
+  border-color: var(--btn-fill);
+  color: var(--btn-fill-fg) !important;
+}
+.btn-fill:hover .btn-label,
+.btn-fill:focus-visible .btn-label,
+.btn-fill:hover .btn-label *,
+.btn-fill:focus-visible .btn-label * {
+  color: var(--btn-fill-fg) !important;
+}
+
+/* Invert for secondary CTAs on dark primary / video heroes */
+.btn-on-dark {
+  --btn-fill: #ffffff;
+  --btn-fill-fg: var(--primary-deep);
+}
+
+/*
+ * Primary nav underline — champagne rule grows in from the left on hover/focus
+ * and exits to the right on leave (origin swaps). Stays drawn while open.
+ */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 0.625rem;
+  right: 0.625rem;
+  bottom: 0.35rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  box-shadow: 0 0 10px color-mix(in oklab, var(--accent) 30%, transparent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-underline:hover::after,
+.nav-underline:focus-visible::after,
+.nav-underline[data-open="true"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------------------------------------------------------------------------
+ * Premium dark surfaces — layered radial glows + film grain for primary panels
+ * (PageHero, admission CTA). Grain needs `relative` on the host element.
+ * ------------------------------------------------------------------------- */
+
+.surface-deep {
+  background-color: var(--primary-deep);
+  background-image:
+    radial-gradient(52rem 30rem at 88% -20%, color-mix(in oklab, var(--primary) 60%, transparent), transparent 62%),
+    radial-gradient(44rem 26rem at -12% 115%, color-mix(in oklab, var(--primary-ink) 90%, transparent), transparent 65%),
+    radial-gradient(30rem 20rem at 62% 125%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%),
+    radial-gradient(36rem 22rem at 30% -30%, color-mix(in oklab, var(--secondary) 38%, transparent), transparent 66%);
+}
+
+.texture-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Header dropdown entrance */
+.menu-pop {
+  animation: fade-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Photo system — tiles, staggered entrances, shine sweep, lightbox
+ * ------------------------------------------------------------------------- */
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lightbox-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lightbox-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Filtered gallery tiles animate in (re-triggered by re-mounting the grid) */
+.tile-in {
+  animation: tile-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Scroll-staggered photo tiles — hidden state gated behind html.js so
+ * photos remain visible without JavaScript. Delay is set inline per tile. */
+html.js .photo-grid .photo-pop {
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s ease;
+}
+html.js .photo-grid.is-visible .photo-pop {
+  opacity: 1;
+  transform: none;
+}
+
+/* Diagonal light sweep across a photo tile on hover */
+.photo-shine {
+  position: relative;
+}
+.photo-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.photo-shine:hover::after,
+.photo-shine:focus-visible::after {
+  transform: translateX(120%);
+}
+
+.lightbox-backdrop {
+  animation: lightbox-backdrop-in 0.3s ease-out both;
+}
+.lightbox-panel {
+  animation: lightbox-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------------------------------------------------------------------------
+ * Glow system — cursor-follow card spotlight, conic accent ring, hero ember,
+ * form focus glow. Everything here is brand-tinted "soft light", never neon.
+ * Cursor effects are mouse-only (pointer: fine) and inert without JavaScript.
+ * ------------------------------------------------------------------------- */
+
+/* Cursor-follow spotlight — <GlowGrid> writes --glow-x/--glow-y (cursor
+ * position relative to each card) and --glow-o onto .glow-card / .glow-rule
+ * children, so the glow travels across the whole grid, not just one card. */
+@media (pointer: fine) {
+  html.js .glow-grid .glow-card,
+  html.js .glow-grid .glow-rule {
+    position: relative;
+  }
+
+  /* Border ring lights up nearest the cursor */
+  html.js .glow-grid .glow-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+      13rem circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      color-mix(in oklab, var(--primary-vivid) 60%, transparent),
+      color-mix(in oklab, var(--secondary) 30%, transparent) 45%,
+      color-mix(in oklab, var(--accent) 16%, transparent) 60%,
+      transparent 72%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: var(--glow-o, 0);
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+
+  /* Faint interior wash on the hovered card only */
+  html.js .glow-grid .glow-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    background: radial-gradient(
+      20rem circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      color-mix(in oklab, var(--primary) 7%, transparent),
+      transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+  html.js .glow-grid .glow-card:hover::after {
+    opacity: 1;
+  }
+
+  /* FeatureCard variant — its only border is the top rule, so the glow is a
+   * highlight travelling along that rule. */
+  html.js .glow-grid .glow-rule::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: radial-gradient(
+      9rem 100% at var(--glow-x, 50%) 50%,
+      color-mix(in oklab, var(--primary) 75%, transparent),
+      color-mix(in oklab, var(--accent) 25%, transparent) 60%,
+      transparent 80%
+    );
+    opacity: var(--glow-o, 0);
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+}
+
+/* Slow conic primary→accent accent ring framing a dark panel (AdmissionCta).
+ * Uses ::after so it can share an element with .texture-grain (::before).
+ * Falls back to a static gradient ring where @property is unsupported. */
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin-ring {
+  to {
+    --spin: 360deg;
+  }
+}
+
+.conic-ring {
+  position: relative;
+}
+.conic-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--spin, 0deg),
+    transparent,
+    color-mix(in oklab, var(--muted) 45%, transparent) 12%,
+    color-mix(in oklab, var(--accent) 55%, transparent) 22%,
+    color-mix(in oklab, var(--muted) 30%, transparent) 32%,
+    transparent 45%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-ring 9s linear infinite;
+  pointer-events: none;
+}
+
+/* Hero ember — breathing ambient glow layered over the video scrims.
+ * Composited (opacity only), no backdrop-filter over video. */
+@keyframes breathe {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-ember {
+  background:
+    radial-gradient(40rem 26rem at 22% 34%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 62%),
+    radial-gradient(30rem 22rem at 78% 80%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 65%);
+  animation: breathe 8.5s ease-in-out infinite alternate;
+}
+
+/* Soft halo on an accent word over dark footage */
+.text-glow-soft {
+  text-shadow: 0 0 28px color-mix(in oklab, var(--accent-light) 45%, transparent);
+}
+
+/* Form focus glow — primary ring + halo replaces the accent outline on fields */
+.input-glow {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.input-glow:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent),
+    0 0 22px color-mix(in oklab, var(--primary) 16%, transparent);
+}
+
+/* Glowing ECG draw-in (pairs with .pulse-line) for form success feedback */
+.pulse-glow {
+  filter: drop-shadow(0 0 5px color-mix(in oklab, var(--success) 55%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .anim-fade-up,
+  html.js .reveal,
+  html.js .reveal .stagger > *,
+  html.js .photo-grid .photo-pop,
+  .tile-in,
+  .lightbox-backdrop,
+  .lightbox-panel {
+    opacity: 1;
+    transform: none;
+  }
+  html.js .reveal .rule-grow {
+    transform: none;
+  }
+  .photo-shine::after,
+  .btn-sheen::after {
+    display: none;
+  }
+  /* Instant solid fill when motion is reduced (no size animation) */
+  .btn-fill {
+    transition: color 0.01ms, border-color 0.01ms, background-color 0.01ms !important;
+  }
+  .btn-fill:hover,
+  .btn-fill:focus-visible {
+    background-image: none;
+    background-color: var(--btn-fill, var(--primary));
+    background-size: 100% 100%;
+    color: var(--btn-fill-fg, #fff) !important;
+  }
+  .btn-fill:hover .btn-label,
+  .btn-fill:focus-visible .btn-label,
+  .btn-fill:hover .btn-label *,
+  .btn-fill:focus-visible .btn-label * {
+    color: var(--btn-fill-fg, #fff) !important;
+  }
+  .nav-underline::after {
+    box-shadow: none;
+  }
+  .pulse-line {
+    stroke-dashoffset: 0;
+  }
+  /* Glow system: freeze the ember, stop the conic sweep (static ring stays),
+   * and hide the cursor-follow layers (GlowGrid JS also no-ops). */
+  .hero-ember {
+    animation: none;
+    opacity: 1;
+  }
+  .conic-ring::after {
+    animation: none;
+  }
+  .skeleton-shimmer {
+    animation: none;
+    background-image: none;
+  }
+  html.js .glow-grid .glow-card::before,
+  html.js .glow-grid .glow-card::after,
+  html.js .glow-grid .glow-rule::before {
+    display: none;
+  }
+}
+
+.prose-institutional p + p {
+  margin-top: 1rem;
+}
+
+.skip-link {
+  position: fixed;
+  inset-inline-start: 1rem;
+  top: 1rem;
+  z-index: 100;
+  max-inline-size: calc(100% - 2rem);
+  transform: translateY(calc(-100% - 2rem));
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  transform: none;
+}

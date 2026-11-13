@@ -1,0 +1,36 @@
+/* ===========================================================================
+ * BRAND THEME — the only file to edit when re-skinning the site for a college.
+ *
+ * Set the four inputs below. Every other colour on the site (dark/deep/ink
+ * shades, hover states, tints, borders, glows, gradients, focus rings) is
+ * derived from them in @college/core/styles.css, so nothing else needs to change.
+ *
+ *   --brand-primary  Main brand colour: header, nav, headings, dark panels.
+ *                    White text sits on it, so keep it dark enough
+ *                    (contrast >= 5.5:1 with #fff gives tints some headroom).
+ *   --brand-accent   Highlight colour: primary buttons, rules, highlights.
+ *                    Small text uses a separate, darker derived shade.
+ *   --brand-text     Body text colour.
+ *   --brand-surface  Page background (a near-white paper tone).
+ *
+ * In tenant-template mode (NEXT_PUBLIC_COLLEGE_PREVIEW=true) --brand-primary is
+ * replaced at runtime by the college's `color_theme` from the Qviple backend,
+ * unless NEXT_PUBLIC_TENANT_THEME=false. Explicit NEXT_PUBLIC_BRAND_PRIMARY
+ * and NEXT_PUBLIC_BRAND_ACCENT values take precedence. Template accent label
+ * contrast is calculated automatically. See @college/core `applyBrandPrimary`.
+ * ======================================================================== */
+:root {
+  --brand-primary: #245b83;
+  --brand-accent: #d8b77b;
+  --brand-text: #24333f;
+  --brand-surface: #f7f9fb;
+
+  /* Label for the light accent above. For a dark CSS-only accent use #fff;
+   * runtime accent overrides calculate this label automatically. */
+  --brand-on-accent: #1c2c39;
+
+  /* Status colours — usually left as they are. */
+  --brand-success: #2e7d4f;
+  --brand-alert: #815512;
+  --brand-error: #b53a2b;
+}

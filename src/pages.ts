@@ -1,5 +1,6 @@
 import { DEFAULT_ASSET_BASE_URL } from './config.js';
 import type { CollegeClient } from './client.js';
+import { CollegeApiError } from './errors.js';
 import { staffFullName } from './domain.js';
 import { assetUrl } from './helpers.js';
 import type { JsonRecord } from './models.js';
@@ -24,6 +25,11 @@ export const INFRASTRUCTURE_SECTIONS: Record<string, string> = {
 export const STUDENT_ZONE_SECTIONS: Record<string, string> = {
   council: "council", support: "support", research: "research", complaint: "complaint",
   scholarship: "scholarship", alumni: "alumni_association",
+};
+/** Readable names for the document collections of `other_data` (Somani institute profile tabs). */
+export const INSTITUTE_DOCUMENT_LABELS: Record<string, string> = {
+  college_layout: "College layout", organogram: "Organogram", idp: "Institutional development plan",
+  model_code_conduct: "Model code of conduct", policies_and_procedures: "Policies and procedures",
 };
 /** Institute activity categories (Somani). URL token → exact `activity_type`. */
 export const INSTITUTE_ACTIVITY_TYPES: Record<string, string> = {
@@ -214,7 +220,15 @@ async function loadCollegePageContent(
   if (module === "side-events") {
     const managerId = typeof params.id === "string" ? params.id : tenant.eventManagerId;
     if (!managerId) return { title: "Events", items: [] };
-    const { all_side } = await client.events.side(managerId, { page: Number(params.page ?? 1), limit: Number(params.limit ?? 10) });
+    let all_side: unknown[];
+    try {
+      ({ all_side } = await client.events.side(managerId, { page: Number(params.page ?? 1), limit: Number(params.limit ?? 10) }));
+    } catch (error) {
+      // "No Main Event" arrives as access:false with an empty list: an empty result, not a failure.
+      const response = error instanceof CollegeApiError ? record(error.details.response) : {};
+      if (error instanceof CollegeApiError && error.kind === "api" && Object.values(response).some(v => Array.isArray(v) && !v.length)) return { title: "Events", items: [] };
+      throw error;
+    }
     return { title: "Events", items: normalize(all_side).map(item => ({ ...item, href: item.href ?? href("event", { id: item.id }) })) };
   }
   if (module === "infrastructure" || module === "student-zone" || module === "institute-documents") {
@@ -222,10 +236,11 @@ async function loadCollegePageContent(
     const data = record(other_data);
     const titles: Record<string, string> = { infrastructure: "Infrastructure", "student-zone": "Student zone", "institute-documents": "Institute documents" };
     if (module === "institute-documents") {
-      const exclude = new Set(["_id", "infrastructure", "student_zone", "createdAt", "updatedAt", "__v", "institute"]);
-      const keys = Object.keys(data).filter(key => !exclude.has(key) && (typeof params.view !== "string" || key === params.view));
+      // Document collections only: identifiers and references (_id, landing_control, …) are not content.
+      const keys = Object.keys(data).filter(key => !["infrastructure", "student_zone"].includes(key) && data[key] !== null && typeof data[key] === "object"
+        && (typeof params.view !== "string" || key === params.view));
       return { title: titles[module]!, items: keys.flatMap(key => {
-        const label = key.replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+        const label = INSTITUTE_DOCUMENT_LABELS[key] ?? key.replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
         const children = normalize(data[key], label);
         return children.length ? [{ id: `document-${key}`, title: label, description: "", children }] : [];
       }) };

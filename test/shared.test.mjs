@@ -120,6 +120,7 @@ test('loadCollegePage: Somani infrastructure, student zone and institute activit
       infrastructure: { gymkhana: { data_list: [{ _id: id(20), title: 'Gym', description: 'Open 7–9' }] } },
       student_zone: { alumni_association: { data_list: [{ _id: id(21), title: 'Alumni body' }] } },
       policies_and_procedures: [{ _id: id(22), title: 'Code of conduct', attach: 'conduct.pdf' }],
+      landing_control: landing, organogram: [],
     } },
     [`/site/category/other/${institute}/detail/query`]: { activity_category: [
       { _id: category, name: 'Annual sports', activity_type: 'Sports' }, { _id: id(23), name: 'Diwali', activity_type: 'Celebrations' },
@@ -134,6 +135,7 @@ test('loadCollegePage: Somani infrastructure, student zone and institute activit
   assert.equal(calls.find((c) => c.path.includes('/other/model/')).query.is_flow, 'Institute');
   assert.deepEqual((await loadCollegePage(client, t, 'student-zone', { view: 'alumni' })).items.map((i) => i.title), ['Alumni body']);
   const docs = await loadCollegePage(client, t, 'institute-documents');
+  assert.deepEqual(docs.items.map((i) => i.title), ['Policies and procedures']);
   assert.equal(docs.items[0].children[0].files[0].url, 'https://cdn.example/conduct.pdf');
   const sports = await loadCollegePage(client, t, 'institute-activities', { view: 'sport' });
   assert.deepEqual(sports.items.map((i) => i.title), ['Annual sports']);
@@ -160,6 +162,13 @@ test('loadCollegePage: flash notice, news, side events, home blocks', async () =
   assert.equal(principal.items[0].description, 'Welcome');
   assert.equal(calls.at(-1).query.is_flow, 'Institute');
   assert.equal(calls.every((c) => c.method === 'GET'), true);
+});
+
+test('side-events treats the backend "No Main Event" answer as empty', async () => {
+  const client = createCollegeClient({ baseUrl: 'https://api.example', fetch: async () => new Response(JSON.stringify({ message: 'No Main Event 👍', access: false, all_main: [] })) });
+  assert.deepEqual((await loadCollegePage(client, tenant(), 'side-events')).items, []);
+  const failing = createCollegeClient({ baseUrl: 'https://api.example', fetch: async () => new Response('{}', { status: 503 }) });
+  await assert.rejects(loadCollegePage(failing, tenant(), 'side-events'), (error) => error.kind === 'http');
 });
 
 test('loadCollegePage honours a custom explore path', async () => {

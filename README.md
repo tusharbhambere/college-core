@@ -16,14 +16,14 @@ A college site installs this package from Git, supplies its own pages and brand 
 Add the package to a site from this Git repository, pinned to a release tag:
 
 ```sh
-npm install "github:tusharbhambere/college-core#v1.1.0"
+npm install "github:tusharbhambere/college-core#v1.1.1"
 ```
 
 `package.json` then contains:
 
 ```json
 "dependencies": {
-  "@college/core": "github:tusharbhambere/college-core#v1.1.0"
+  "@college/core": "github:tusharbhambere/college-core#v1.1.1"
 }
 ```
 
@@ -150,7 +150,7 @@ The website directory loader retains the existing staff request (`page: 1, limit
 
 ```sh
 npm ci
-npm test            # build + 177 contract, business-rule, adapter and React render tests
+npm test            # build + contract, business-rule, adapter and React render tests
 ```
 
 Release (maintainers):

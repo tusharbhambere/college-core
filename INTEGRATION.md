@@ -5,7 +5,7 @@ This guide adds the shared package to a new (or existing) college site. The refe
 ## 1. Install
 
 ```sh
-npm install "github:tusharbhambere/college-core#v1.1.0"
+npm install "github:tusharbhambere/college-core#v1.1.1"
 ```
 
 Requirements: Node ≥ 20 for builds and scripts, ESM imports. The React entry needs React ≥ 19.2; the stylesheet needs Tailwind CSS v4. The core entry has no dependencies and works in any framework (Vue, Svelte, Astro, plain scripts) or in Node build steps.

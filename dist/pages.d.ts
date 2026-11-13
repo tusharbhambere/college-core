@@ -9,6 +9,8 @@ export interface CollegePageOptions {
 export declare const INFRASTRUCTURE_SECTIONS: Record<string, string>;
 /** Student-zone tabs of `other_data.student_zone` (Somani). URL token → API key. */
 export declare const STUDENT_ZONE_SECTIONS: Record<string, string>;
+/** Readable names for the document collections of `other_data` (Somani institute profile tabs). */
+export declare const INSTITUTE_DOCUMENT_LABELS: Record<string, string>;
 /** Institute activity categories (Somani). URL token → exact `activity_type`. */
 export declare const INSTITUTE_ACTIVITY_TYPES: Record<string, string>;
 /**

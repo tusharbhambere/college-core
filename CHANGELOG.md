@@ -2,6 +2,12 @@
 
 All notable changes to `@college/core`. Versions follow [SemVer](https://semver.org).
 
+## 1.1.1 — 2026-11-13
+
+### Fixed
+- `institute-documents` lists only document collections (with readable names) and no longer shows internal references such as `landing_control`.
+- `side-events` treats the backend's empty answer ("No Main Event", `access: false`) as an empty list instead of an error.
+
 ## 1.1.0 — 2026-11-13
 
 First release from the standalone Git repository. Fully backwards compatible with 1.0.x.
